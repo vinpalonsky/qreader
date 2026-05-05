@@ -42,9 +42,5 @@ python3 -m http.server 8080
 ```
 
 ### GitHub Pages
-Set GitHub Pages to use GitHub Actions, or add a PAT secret to enable it automatically.
-
-- Manual: Repository Settings -> Pages -> Build and deployment -> Source: GitHub Actions.
-- Automatic: Create a classic PAT with repo scope and add it as `PAGES_TOKEN`.
-
+Set GitHub Pages to use GitHub Actions in Repository Settings -> Pages.
 Then open the published URL on your phone.
