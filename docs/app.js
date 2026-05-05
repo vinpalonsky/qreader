@@ -36,6 +36,9 @@ function formatError(err) {
   if (err.code) {
     parts.push(`code=${err.code}`);
   }
+  if (err.constraint) {
+    parts.push(`constraint=${err.constraint}`);
+  }
   if (!parts.length) {
     try {
       return JSON.stringify(err);
@@ -68,6 +71,7 @@ async function setupReader() {
   }
 
   codeReader = new ZXing.BrowserQRCodeReader();
+  console.log("App started");
   logEvent("ZXing initialized");
 
   if (!window.isSecureContext) {
@@ -96,10 +100,15 @@ async function setupReader() {
       return;
     }
 
+    let missingIds = 0;
     devices.forEach((device, index) => {
       const option = document.createElement("option");
-      option.value = device.deviceId;
+      const deviceId = device.deviceId || "";
+      option.value = deviceId;
       option.textContent = device.label || `Camera ${index + 1}`;
+      if (!deviceId) {
+        missingIds += 1;
+      }
       cameraSelect.appendChild(option);
     });
 
@@ -112,6 +121,9 @@ async function setupReader() {
     }
 
     logEvent("Cameras detected", `${devices.length}`);
+    if (missingIds) {
+      logEvent("DeviceId missing", `${missingIds}/${devices.length}`);
+    }
 
     setStatus("Ready to scan.");
   } catch (err) {
@@ -125,12 +137,16 @@ async function startScanning() {
     return;
   }
 
-  const deviceId = cameraSelect.value || "";
+  const rawDeviceId = cameraSelect.value || "";
+  const deviceId = normalizeDeviceId(rawDeviceId);
   setStatus("Starting camera...");
   startBtn.disabled = true;
   stopBtn.disabled = false;
   lastError = "";
-  logEvent("Starting scan", deviceId ? `device=${deviceId}` : "device=default");
+  logEvent(
+    "Starting scan",
+    deviceId ? `device=${deviceId}` : rawDeviceId ? `device=${rawDeviceId}` : "device=default"
+  );
 
   if (codeReader.reset) {
     codeReader.reset();
@@ -232,6 +248,17 @@ window.addEventListener("beforeunload", () => {
 setupReader();
 setResult("");
 
+function normalizeDeviceId(value) {
+  if (!value) {
+    return "";
+  }
+  const trimmed = String(value).trim();
+  if (!trimmed || trimmed === "undefined" || trimmed === "null") {
+    return "";
+  }
+  return trimmed;
+}
+
 function handleDecodeResult(result, err) {
   if (result) {
     const text = result.getText();
@@ -255,7 +282,10 @@ function handleDecodeResult(result, err) {
 function pickPreferredDevice(devices) {
   const preferred = devices.find((device) => {
     const label = (device.label || "").toLowerCase();
-    return label.includes("back") || label.includes("rear") || label.includes("environment");
+    return (
+      device.deviceId &&
+      (label.includes("back") || label.includes("rear") || label.includes("environment"))
+    );
   });
   return preferred ? preferred.deviceId : "";
 }
