@@ -103,6 +103,14 @@ async function setupReader() {
       cameraSelect.appendChild(option);
     });
 
+    const preferred = pickPreferredDevice(devices);
+    if (preferred) {
+      cameraSelect.value = preferred;
+      logEvent("Preferred camera", preferred);
+    } else if (devices[0]) {
+      cameraSelect.value = devices[0].deviceId;
+    }
+
     logEvent("Cameras detected", `${devices.length}`);
 
     setStatus("Ready to scan.");
@@ -113,38 +121,66 @@ async function setupReader() {
 }
 
 async function startScanning() {
-  console.log("Start scanning");
   if (!codeReader) {
     return;
   }
 
-  const deviceId = cameraSelect.value || undefined;
+  const deviceId = cameraSelect.value || "";
   setStatus("Starting camera...");
   startBtn.disabled = true;
   stopBtn.disabled = false;
   lastError = "";
   logEvent("Starting scan", deviceId ? `device=${deviceId}` : "device=default");
 
-  try {
-    await codeReader.decodeFromVideoDevice(deviceId, videoEl, (result, err) => {
-      if (result) {
-        const text = result.getText();
-        if (text !== lastText) {
-          lastText = text;
-          setResult(text);
-          setStatus("QR detected.");
-        }
-      }
+  if (codeReader.reset) {
+    codeReader.reset();
+  }
 
-      if (err && !(err instanceof ZXing.NotFoundException)) {
-        const detail = formatError(err);
-        if (detail !== lastError) {
-          lastError = detail;
-          logEvent("Scan error", detail);
-        }
-        setStatus("Scanner error. Try restarting.");
-      }
+  const attempts = [];
+  if (deviceId) {
+    attempts.push({
+      label: `deviceId=${deviceId}`,
+      constraints: { video: { deviceId: { exact: deviceId } } },
     });
+  }
+  attempts.push({
+    label: "facingMode=environment",
+    constraints: { video: { facingMode: { ideal: "environment" } } },
+  });
+  attempts.push({
+    label: "video=true",
+    constraints: { video: true },
+  });
+
+  try {
+    if (typeof codeReader.decodeFromConstraints !== "function") {
+      logEvent("Decoder fallback", "decodeFromVideoDevice");
+      await codeReader.decodeFromVideoDevice(deviceId || undefined, videoEl, (result, err) => {
+        handleDecodeResult(result, err);
+      });
+      return;
+    }
+
+    for (const attempt of attempts) {
+      logEvent("Trying constraints", attempt.label);
+      try {
+        await codeReader.decodeFromConstraints(attempt.constraints, videoEl, (result, err) => {
+          handleDecodeResult(result, err);
+        });
+        return;
+      } catch (err) {
+        const detail = formatError(err);
+        logEvent("Start failed", `${attempt.label} - ${detail}`);
+        if (err && err.name === "NotAllowedError") {
+          setStatus("Camera permission denied.");
+          break;
+        }
+        if (err && err.name === "NotReadableError") {
+          setStatus("Camera is already in use.");
+          break;
+        }
+      }
+    }
   } catch (err) {
     setStatus("Failed to start camera.");
     logEvent("Failed to start camera", formatError(err));
@@ -152,6 +188,9 @@ async function startScanning() {
     startBtn.disabled = false;
     stopBtn.disabled = true;
   }
+
+  startBtn.disabled = false;
+  stopBtn.disabled = true;
 }
 
 function stopScanning() {
@@ -192,3 +231,31 @@ window.addEventListener("beforeunload", () => {
 
 setupReader();
 setResult("");
+
+function handleDecodeResult(result, err) {
+  if (result) {
+    const text = result.getText();
+    if (text !== lastText) {
+      lastText = text;
+      setResult(text);
+      setStatus("QR detected.");
+    }
+  }
+
+  if (err && !(err instanceof ZXing.NotFoundException)) {
+    const detail = formatError(err);
+    if (detail !== lastError) {
+      lastError = detail;
+      logEvent("Scan error", detail);
+    }
+    setStatus("Scanner error. Try restarting.");
+  }
+}
+
+function pickPreferredDevice(devices) {
+  const preferred = devices.find((device) => {
+    const label = (device.label || "").toLowerCase();
+    return label.includes("back") || label.includes("rear") || label.includes("environment");
+  });
+  return preferred ? preferred.deviceId : "";
+}
