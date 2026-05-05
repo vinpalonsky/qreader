@@ -112,6 +112,45 @@ body {
   border: 1px solid var(--border);
 }
 
+.logs {
+  background: var(--panel);
+  border-radius: 1rem;
+  padding: 1rem 1.25rem;
+  border: 1px solid var(--border);
+}
+
+.logs__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.75rem;
+}
+
+.logs__header h2 {
+  margin: 0;
+  font-size: 1.2rem;
+}
+
+.logs__header button {
+  background: var(--accent);
+  color: #fff;
+  border: none;
+  border-radius: 0.6rem;
+  padding: 0.45rem 0.75rem;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.logs pre {
+  margin: 0;
+  font-size: 0.95rem;
+  white-space: pre-wrap;
+  word-break: break-word;
+  color: var(--ink);
+  max-height: 240px;
+  overflow-y: auto;
+}
+
 .result h2 {
   margin: 0 0 0.75rem;
   font-size: 1.2rem;
