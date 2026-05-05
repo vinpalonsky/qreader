@@ -1,47 +1,50 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>QReader Mobile</title>
-    <link rel="stylesheet" href="styles.css" />
-  </head>
-  <body>
-    <main class="app">
-      <header class="app__header">
-        <h1>QReader Mobile</h1>
-        <p>Scan a QR code with your phone camera.</p>
-      </header>
 
-      <section class="panel">
-        <div class="panel__controls">
-          <label for="cameraSelect">Camera</label>
-          <select id="cameraSelect"></select>
-          <button id="startBtn" type="button">Start</button>
-          <button id="stopBtn" type="button" disabled>Stop</button>
-        </div>
-        <div class="panel__status" id="status">Idle</div>
-      </section>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>QReader Mobile</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
 
-      <section class="viewer">
-        <video id="preview" autoplay muted playsinline></video>
-      </section>
+<body>
+  <main class="app">
+    <header class="app__header">
+      <h1>QReader Mobile</h1>
+      <p>Scan a QR code with your phone camera.</p>
+    </header>
 
-      <section class="result">
-        <h2>Last Result</h2>
-        <pre id="result">No scan yet.</pre>
-      </section>
+    <section class="panel">
+      <div class="panel__controls">
+        <label for="cameraSelect">Camera</label>
+        <select id="cameraSelect"></select>
+        <button id="startBtn" type="button">Start</button>
+        <button id="stopBtn" type="button" disabled>Stop</button>
+      </div>
+      <div class="panel__status" id="status">Idle</div>
+    </section>
 
-      <section class="logs">
-        <div class="logs__header">
-          <h2>Debug Log</h2>
-          <button id="copyLogs" type="button">Copy</button>
-        </div>
-        <pre id="logs">Ready.</pre>
-      </section>
-    </main>
+    <section class="viewer">
+      <video id="preview" autoplay muted playsinline></video>
+    </section>
 
-    <script src="https://unpkg.com/@zxing/library@0.20.0/umd/index.min.js"></script>
-    <script src="app.js"></script>
-  </body>
+    <section class="result">
+      <h2>Last Result</h2>
+      <pre id="result">No scan yet.</pre>
+    </section>
+
+    <section class="logs">
+      <div class="logs__header">
+        <h2>Debug Log</h2>
+        <button id="copyLogs" type="button">Copy</button>
+      </div>
+      <pre id="logs">Ready.</pre>
+    </section>
+  </main>
+
+  <script src="https://unpkg.com/@zxing/library@0.20.0/umd/index.min.js"></script>
+  <script src="app.js"></script>
+</body>
+
 </html>

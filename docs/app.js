@@ -113,6 +113,7 @@ async function setupReader() {
 }
 
 async function startScanning() {
+  console.log("Start scanning");
   if (!codeReader) {
     return;
   }
@@ -147,6 +148,7 @@ async function startScanning() {
   } catch (err) {
     setStatus("Failed to start camera.");
     logEvent("Failed to start camera", formatError(err));
+    console.error("Camera start error", err);
     startBtn.disabled = false;
     stopBtn.disabled = true;
   }
