@@ -1,0 +1,137 @@
+:root {
+  color-scheme: light;
+  --bg: #f7f4ef;
+  --panel: #ffffff;
+  --ink: #1f1b16;
+  --accent: #1f7a8c;
+  --muted: #6d5c4f;
+  --border: #e6ded3;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: "Space Grotesk", "Segoe UI", sans-serif;
+  color: var(--ink);
+  background: radial-gradient(circle at top, #fff7e8, #f0ebe3 45%, #e9e2d7 100%);
+  min-height: 100vh;
+}
+
+.app {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 2rem 1.25rem 3rem;
+  display: grid;
+  gap: 1.5rem;
+}
+
+.app__header h1 {
+  font-size: 2.5rem;
+  margin: 0 0 0.25rem;
+}
+
+.app__header p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 1.1rem;
+}
+
+.panel {
+  background: var(--panel);
+  padding: 1rem 1.25rem;
+  border-radius: 1rem;
+  border: 1px solid var(--border);
+  box-shadow: 0 10px 25px rgba(31, 27, 22, 0.06);
+}
+
+.panel__controls {
+  display: grid;
+  gap: 0.75rem;
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.panel__controls label {
+  font-weight: 600;
+}
+
+.panel__controls select,
+.panel__controls button {
+  width: 100%;
+  padding: 0.65rem 0.75rem;
+  border-radius: 0.75rem;
+  border: 1px solid var(--border);
+  font-size: 1rem;
+}
+
+.panel__controls button {
+  background: var(--accent);
+  color: #fff;
+  border: none;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.panel__controls button:disabled {
+  background: #c9c1b8;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+.panel__controls button:not(:disabled):hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 12px rgba(31, 122, 140, 0.25);
+}
+
+.panel__status {
+  margin-top: 0.75rem;
+  color: var(--muted);
+  font-size: 0.95rem;
+}
+
+.viewer {
+  border-radius: 1.5rem;
+  overflow: hidden;
+  border: 1px solid var(--border);
+  background: #000;
+}
+
+.viewer video {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.result {
+  background: var(--panel);
+  border-radius: 1rem;
+  padding: 1rem 1.25rem;
+  border: 1px solid var(--border);
+}
+
+.result h2 {
+  margin: 0 0 0.75rem;
+  font-size: 1.2rem;
+}
+
+.result pre {
+  margin: 0;
+  font-size: 1rem;
+  white-space: pre-wrap;
+  word-break: break-word;
+  color: var(--ink);
+}
+
+@media (min-width: 720px) {
+  .panel__controls {
+    grid-template-columns: 1fr auto auto;
+    align-items: end;
+  }
+
+  .panel__controls select {
+    min-width: 240px;
+  }
+}
